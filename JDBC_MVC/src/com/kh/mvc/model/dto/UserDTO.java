@@ -35,11 +35,11 @@ public class UserDTO {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public Date getEnrollDtate() {
-		return enrollDtate;
+	public Date getEnrollDate() {
+		return enrollDate;
 	}
-	public void setEnrollDtate(Date enrollDtate) {
-		this.enrollDtate = enrollDtate;
+	public void setEnrollDate(Date enrollDate) {
+		this.enrollDate = enrollDate;
 	}
 
 	

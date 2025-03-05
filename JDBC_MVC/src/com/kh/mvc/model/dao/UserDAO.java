@@ -1,5 +1,15 @@
 package com.kh.mvc.model.dao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.kh.mvc.model.dto.UserDTO;
+
 /**
  * DAO(Data Access Object)
  * 
@@ -48,6 +58,20 @@ public class UserDAO {
 	 * 				  SELECT > 6_1에서 만든거 
 	 * 				  DML : 처리된 행의 개수
 	 */
+	private final String URL = "jdbc:oracle:thin:@192.168.130.17:1521:xe";
+	private final String USERNAME = "KH20_CSH";
+	private final String PASSWORD = "KH1234";
+	
+	static {
+		try {
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		}catch(ClassNotFoundException e) {
+			System.out.println("ojdbc...잘넣었나요?"
+								+ "\n 오타 안났나요?????");
+		}
+		
+	}
+	private PreparedStatement pstmt;
 	
 	public List<UserDTO> findAll() {
 		
@@ -72,19 +96,109 @@ public class UserDAO {
 					+"ORDER "
 						+"BY "
 							+ "ENROLL_DATE DESC";
+		// Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
 		
+		try {
+		// conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+		
+		// conn.setAutoCommit(false);
+		pstmt = conn.prepareStatement(sql);
+		rset = pstmt.executeQuery();
+		
+		while(rset.next()) {
+			UserDTO user = new UserDTO();
+			user.setUserNo(rset.getInt("USER_NO"));
+			user.setUserId(rset.getString("USER_ID"));
+			user.setUserPw(rset.getString("USER_PW"));
+			user.setUserName(rset.getString("USER_NAME"));
+			user.setEnrollDate(rset.getDate("ENROLL_DATE"));
+
+			list.add(user);
+		}
+		
+		} catch (SQLException e) {
+			System.out.println("오타가 나지 않았나요?? 확인하셨나요?? 두 번 봤나요?");
+		} finally {
+			
+			try {
+				if(rset != null) {
+					rset.close();
+				}
+			} catch (SQLException e)	{
+				System.out.println("몰라 DB서버이상해");
+			}
+			try {
+				if(pstmt != null) {
+					pstmt.close();
+				}
+			} catch(SQLException e) {
+				System.out.println("PreparedStatement 이상해요~");
+			}
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return list;
+	}
+	/**
+	 * @param user 사용자가 입력한 아이디 / 비밀번호 / 이름이 각각 필드에 대입되어있음
+	 * @return 아직 뭐 돌려줄지 안정함
+	 */
+	public int insertUser(UserDTO user) {
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		
+		String sql = "INSERT "
+					 + "INTO "
+					 	+ "TB_USER "
+					 	+"VALUES " 
+					 	+ "("
+					 	+ "SEQ_USER_NO.NEXTVAL"
+					 + ", ?"
+					 + ", ?"
+					 + ", ?"
+					 + ", SYSDATE"
+					 	+ ")";
+		// 문제) HashMap의 특징은?
+		int result = 0;
+		try {
+			conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+		
+		// conn.setAutoCommit(false);
+		pstmt = conn.prepareStatement(sql);
+		
+		pstmt.setString(1, user.getUserId());
+		pstmt.setString(2, user.getUserPw());
+		pstmt.setString(3, user.getUserName());
+		
+		result = pstmt.executeUpdate();
+		
+		
+	} catch(SQLException e) {
+		e.printStackTrace();
+	} finally {
+		try {
+			if(pstmt != null && !pstmt.isClosed()) pstmt.close();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if(conn != null) conn.close();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+		return result;
+	
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 }
