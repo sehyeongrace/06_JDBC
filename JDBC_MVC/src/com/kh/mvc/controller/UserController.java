@@ -13,11 +13,10 @@ import com.kh.mvc.model.service.MemberService;
  */
 public class UserController {
 	
-	private UserDAO userDao = new UserDAO();
 	private MemberService userService = new MemberService();
 	
 	public List<UserDTO> findAll() {
-			return userService.findAll();
+		return userService.findAll();
 	}
 	
 	public int insertUser(String userId, String userPw, String userName) {
@@ -26,7 +25,7 @@ public class UserController {
 		user.setUserPw(userPw);
 		user.setUserName(userName);
 		
-		int result = userDao.insertUser(user);
+		int result = userService.insertUser(user);
 		user = null;
 		return result;
 	}
@@ -37,4 +36,15 @@ public class UserController {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 }
